@@ -5,7 +5,7 @@
 ```
 	mkdir build
 	cd build
-	make ../
+	cmake ../
 	./test
 ```
 
