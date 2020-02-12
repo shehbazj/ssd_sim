@@ -6,7 +6,7 @@ using namespace std;
 
 class ssd {
 	private:
-		vector <block> block_array;
+		vector <block *> block_array;
 		unsigned long num_blocks_in_ssd;
 		unsigned long size_of_block;
 		int current_block_number;

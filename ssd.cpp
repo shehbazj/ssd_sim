@@ -9,9 +9,10 @@ ssd :: ssd(int num_blocks, int bs, int ps, int ssd_cell_type)
 	max_invalid_cell_threshold = 80;
 	max_invalid_block_threshold = 80;
 	max_invalid_page_threshold = 80;
-	block_array = vector < block> (num_blocks, block(num_pages, ps ,ssd_cell_type, 0, NO_WOM));
-	for (int i = 0 ; i < num_pages ; i++) {
-		block_array[i].setBlockNumber(i);
+
+	for (int i = 0 ; i < num_blocks ; i++) {
+		block_array.push_back(new block(num_pages, ps ,ssd_cell_type, 0, NO_WOM));
+		block_array[i]->setBlockNumber(i);
 	}
 }
 
@@ -49,7 +50,9 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 
 ssd :: ~ssd()
 {
-
+	for (int i = 0 ; i < num_blocks_in_ssd ; i++) {
+		delete block_array[i];
+	}
 }
 
 void ssd :: invokeGC()
