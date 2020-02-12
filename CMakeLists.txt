@@ -11,6 +11,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 # Builds SSD Emulator
 add_executable(emulator page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp main.cpp)
  
+add_executable(main_gc page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp main_gc.cpp)
+
 add_executable(tests test.cpp)
 
 # Link runTests with what we want to test and the GTest and pthread library
