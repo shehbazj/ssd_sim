@@ -13,6 +13,10 @@ add_executable(emulator page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp m
  
 add_executable(main_gc page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp main_gc.cpp)
 
+add_executable(main_visualize page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp main_visualize.cpp)
+
+add_executable(main_parallel page_md.cpp page_group.cpp coder.cpp block.cpp ssd.cpp main_parallel.cpp)
+
 add_executable(tests test.cpp)
 
 # Link runTests with what we want to test and the GTest and pthread library

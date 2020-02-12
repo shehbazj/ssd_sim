@@ -19,3 +19,5 @@ We use the gtest framework to test SSD code.
 To see how each of the components can be called for reading and writing, please refer test.cpp.
 
 While adding code, please also add relevant tests to the test.cpp file that test the newly added code.
+
+![SSD Layout](fig/SSDSimulatorLayout.png)
