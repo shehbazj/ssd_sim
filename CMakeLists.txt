@@ -20,6 +20,8 @@ add_executable(main_parallel page_md.cpp page_group.cpp coder.cpp block.cpp ssd.
 
 add_executable(tests test.cpp)
 
+add_executable(parallel_tests parallel_test.cpp)
+
 # Link runTests with what we want to test and the GTest and pthread library
 target_link_libraries(tests ${GTEST_LIBRARIES} pthread)
-
+target_link_libraries(parallel_tests ${GTEST_LIBRARIES} pthread)

@@ -19,16 +19,6 @@ int main()
 	}
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 
-	// Try writing and reading from disk
-	printf("Starting writes\n");
-	mySSD->write_to_disk(wdata, ssd_capacity_in_bytes);
-	mySSD->read_from_disk(rdata, ssd_capacity_in_bytes);
-	for (int i = 0 ; i < ssd_capacity_in_bytes ; i++) {
-		if(wdata[i] != rdata[i] && i < 20) {
-			printf("i=%d w=%d r=%d\n", i, wdata[i], rdata[i]);
-		}
-	}
-
 	// NEW CODE-- does block level creation, block level write and read.
 
 	block *b = new block(block_size, page_size , ssd_cell_type, 0, NO_WOM);
@@ -49,6 +39,7 @@ int main()
 	b->readFromBlock(rbdata, block_capacity_in_bytes);
 
 	for (int i = 0 ; i < block_capacity_in_bytes ; i++) {
+		// printf("i=%d w=%d r=%d\n", i, wbdata[i], rbdata[i]);
 		assert(wbdata[i] == rbdata[i]);
 	}
 
