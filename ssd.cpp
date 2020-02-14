@@ -37,6 +37,15 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	// generate page vector from buf.
 	// do write_to_block(block_no, vector_of_pages);
 
+	// Find number of blocks needed to write the buffer
+	int needed_blocks = size / size_of_block + 1;
+	uint8_t *block_buf = buf;
+
+	for (int i = 0; i < needed_blocks; i++) {
+		int offset = block_array[i]->writeToBlock(block_buf, size_of_block);
+		block_buf += offset;
+	} 
+
 	assert(buf != NULL);
 	return 0;
 }
