@@ -9,6 +9,7 @@ class ssd {
 		vector <block *> block_array;
 		unsigned long num_blocks_in_ssd;
 		unsigned long size_of_block;
+		unsigned long bytes_per_block;
 		int current_block_number;
 
 		unsigned max_invalid_cell_threshold;

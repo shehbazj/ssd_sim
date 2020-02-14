@@ -4,6 +4,7 @@ ssd :: ssd(int num_blocks, int bs, int ps, int ssd_cell_type)
 	int num_pages = bs / ps;
 	num_blocks_in_ssd = num_blocks;
 	size_of_block = bs;
+	bytes_per_block = bs * ps * ssd_cell_type;
 
 	current_block_number = 0;
 	max_invalid_cell_threshold = 80;
@@ -37,8 +38,11 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	// generate page vector from buf.
 	// do write_to_block(block_no, vector_of_pages);
 
+	assert(buf != NULL);
+
 	// Find number of blocks needed to write the buffer
-	int needed_blocks = size / size_of_block + 1;
+	int needed_blocks = size / bytes_per_block;
+	assert(needed_blocks <= num_blocks_in_ssd); 
 	uint8_t *block_buf = buf;
 
 	for (int i = 0; i < needed_blocks; i++) {
@@ -46,7 +50,6 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 		block_buf += offset;
 	} 
 
-	assert(buf != NULL);
 	return 0;
 }
 
@@ -54,6 +57,15 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 int ssd :: read_from_disk(uint8_t *buf, int size)
 {
 	assert(buf != NULL);
+
+	// int needed_blocks = size / size_of_block + 1;
+	// uint8_t *block_buf = buf;
+
+	// for (int i = 0; i < needed_blocks; i++) {
+	// 	int offset = block_array[i]->readFromBlock(block_buf, size_of_block);
+	// 	block_buf += offset;
+	// } 
+
 	return 0;
 }
 
