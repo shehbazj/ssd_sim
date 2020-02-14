@@ -4,6 +4,7 @@
 int main()
 {
 	int num_blocks = 10;
+	// block size is the number of pages inside the block.
 	int block_size = 20;
 	int page_size = 10;
 	int ssd_cell_type = 3; // Multi-level cell
@@ -28,7 +29,33 @@ int main()
 		}
 	}
 
+	// NEW CODE-- does block level creation, block level write and read.
+
+	block *b = new block(block_size, page_size , ssd_cell_type, 0, NO_WOM);
+
+	printf("physical block size = %lu\n", b->getPhysicalBlockSize());
+	printf("logical block size = %lu\n",b->getLogicalBlockSize());
+
+	int block_capacity_in_bytes = b->getPhysicalBlockSize();
+
+	uint8_t *wbdata = new uint8_t [block_capacity_in_bytes]();
+	uint8_t *rbdata = new uint8_t [block_capacity_in_bytes]();
+
+	for (int i = 0 ; i < block_capacity_in_bytes ; i++) {
+		wbdata[i] = 0xFF;
+	}
+
+	b->writeToBlock(wbdata, block_capacity_in_bytes);
+	b->readFromBlock(rbdata, block_capacity_in_bytes);
+
+	for (int i = 0 ; i < block_capacity_in_bytes ; i++) {
+		assert(wbdata[i] == rbdata[i]);
+	}
+
 	delete []wdata;
 	delete []rdata;
+	delete []wbdata;
+	delete []rbdata;
+	delete b;
 	delete mySSD;
 }
