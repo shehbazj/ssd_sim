@@ -22,12 +22,12 @@ int main()
 	printf("Starting writes\n");
 	mySSD->write_to_disk(wdata, ssd_capacity_in_bytes);
 	printf("Finished writes\n");
-	// mySSD->read_from_disk(rdata, ssd_capacity_in_bytes);
-	// for (int i = 0 ; i < ssd_capacity_in_bytes ; i++) {
-	// 	if(wdata[i] != rdata[i]) {
-	// 		printf("i=%d w=%d r=%d\n", i, wdata[i], rdata[i]);
-	// 	}
-	// }
+	mySSD->read_from_disk(rdata, ssd_capacity_in_bytes);
+	for (int i = 0 ; i < ssd_capacity_in_bytes ; i++) {
+		if(wdata[i] != rdata[i]) {
+			printf("i=%d w=%d r=%d\n", i, wdata[i], rdata[i]);
+		}
+	}
 
 	delete []wdata;
 	delete []rdata;

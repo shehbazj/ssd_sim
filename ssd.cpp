@@ -58,13 +58,15 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 {
 	assert(buf != NULL);
 
-	// int needed_blocks = size / size_of_block + 1;
-	// uint8_t *block_buf = buf;
+	// Find number of blocks needed to write the buffer
+	int needed_blocks = size / bytes_per_block;
+	assert(needed_blocks <= num_blocks_in_ssd); 
+	uint8_t *block_buf = buf;
 
-	// for (int i = 0; i < needed_blocks; i++) {
-	// 	int offset = block_array[i]->readFromBlock(block_buf, size_of_block);
-	// 	block_buf += offset;
-	// } 
+	for (int i = 0; i < needed_blocks; i++) {
+		int offset = block_array[i]->readFromBlock(block_buf, size_of_block);
+		block_buf += offset;
+	} 
 
 	return 0;
 }
