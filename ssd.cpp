@@ -38,6 +38,7 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	// generate page vector from buf.
 	// do write_to_block(block_no, vector_of_pages);
 
+	// Check if caller has initialized buffer
 	assert(buf != NULL);
 
 	// Find number of blocks needed to write the buffer
@@ -56,6 +57,7 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 /* buf is initialized by caller */
 int ssd :: read_from_disk(uint8_t *buf, int size)
 {
+	// Check if caller has initialized buffer
 	assert(buf != NULL);
 
 	// Find number of blocks needed to write the buffer
