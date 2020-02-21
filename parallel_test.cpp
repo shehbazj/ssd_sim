@@ -11,7 +11,7 @@
 
 // Parallelization tests
 
-TEST(ParallelTest, writeAndReadBlocks)
+TEST(ParallelTest, writeAndReadBlock)
 {
 	int num_blocks = 10;
 	// block size is the number of pages inside the block.
@@ -19,14 +19,6 @@ TEST(ParallelTest, writeAndReadBlocks)
 	int page_size = 10;
 	int ssd_cell_type = 3; // Multi-level cell
 
-	int ssd_capacity_in_bytes = num_blocks * block_size * page_size * ssd_cell_type;
-
-	uint8_t *wdata = new uint8_t [ssd_capacity_in_bytes]();
-	uint8_t *rdata = new uint8_t [ssd_capacity_in_bytes]();
-
-	for (int i = 0 ; i < ssd_capacity_in_bytes ; i++) {
-		wdata[i] = 0xFF;
-	}
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 
 	// NEW CODE-- does block level creation, block level write and read.
@@ -50,8 +42,6 @@ TEST(ParallelTest, writeAndReadBlocks)
 		ASSERT_EQ(wbdata[i], rbdata[i]);
 	}
 
-	delete []wdata;
-	delete []rdata;
 	delete []wbdata;
 	delete []rbdata;
 	delete b;
