@@ -21,3 +21,21 @@ To see how each of the components can be called for reading and writing, please 
 While adding code, please also add relevant tests to the test.cpp file that test the newly added code.
 
 ![SSD Layout](fig/SSDSimulatorLayout.png)
+
+2. Configuring Qt
+
+Qt can be installed using the following:
+
+```
+sudo apt-get install build-essential
+sudo apt-get install qtcreator
+sudo apt-get install qt5-default
+```
+
+To build a Qt project:
+
+```
+qmake -project
+qmake
+make
+```
