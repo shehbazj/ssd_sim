@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/test.dir/test.o  -o test -rdynamic -lboost_filesystem -lboost_regex -lboost_system 

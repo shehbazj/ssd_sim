@@ -22,7 +22,25 @@ While adding code, please also add relevant tests to the test.cpp file that test
 
 ![SSD Layout](fig/SSDSimulatorLayout.png)
 
-2. Profiling code
+2. Configuring Qt
+
+Qt can be installed using the following:
+
+```
+sudo apt-get install build-essential
+sudo apt-get install qtcreator
+sudo apt-get install qt5-default
+```
+
+To build a Qt project:
+
+```
+qmake -project
+qmake
+make
+```
+
+3. Profiling code
 
 To profile the code, you need to add an option for the compiler (`'-pg`). This is done in the CMake file in the `profiling` branch.
 
@@ -30,4 +48,3 @@ After making the file with necessary options, run the gprof tool to output the p
 
 ```
 $  gprof test_gprof gmon.out > analysis.txt
-```
