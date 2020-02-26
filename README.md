@@ -39,3 +39,12 @@ qmake -project
 qmake
 make
 ```
+
+3. Profiling code
+
+To profile the code, you need to add an option for the compiler (`'-pg`). This is done in the CMake file in the `profiling` branch.
+
+After making the file with necessary options, run the gprof tool to output the profiler results.
+
+```
+$  gprof test_gprof gmon.out > analysis.txt
