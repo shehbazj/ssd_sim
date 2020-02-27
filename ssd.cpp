@@ -46,9 +46,16 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	assert(needed_blocks <= num_blocks_in_ssd); 
 	uint8_t *block_buf = buf;
 
+	uint8_t *rbdata = new uint8_t [size]();
+	cout << "Bytes " << bytes_per_block;	
 	for (int i = 0; i < needed_blocks; i++) {
+		
 		int offset = block_array[i]->writeToBlock(block_buf, bytes_per_block);
-		block_buf += offset;
+		int offset2 = block_array[i]->readFromBlock(rbdata, bytes_per_block);
+		printf("i=%d w=%d r=%d\n", i, block_buf[i], rbdata[i]);
+		cout << offset << endl << offset2 << endl;
+		block_buf += bytes_per_block;
+		rbdata += bytes_per_block;
 	} 
 
 	return 0;
@@ -63,8 +70,35 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 	// Find number of blocks needed to write the buffer
 	int needed_blocks = size / bytes_per_block;
 	assert(needed_blocks <= num_blocks_in_ssd); 
+	uint8_t *block_buf = buf;
 
 	for (int i = 0; i < needed_blocks; i++) {
+		int offset = block_array[i]->readFromBlock(block_buf, bytes_per_block);
+		block_buf += offset;
+	} 
+
+	return 0;
+}
+
+/*
+ * Takes in an integer to split up the buffer into n
+ * Used for parallelizing reads
+*/
+int ssd :: read_from_disk(uint8_t *buf, int size, int n, int total_threads)
+{
+	// Check if caller has initialized buffer
+	assert(buf != NULL);
+
+	// Find number of blocks needed to write the buffer
+	int needed_blocks = size / bytes_per_block;
+	assert(needed_blocks <= num_blocks_in_ssd); 
+	uint8_t *block_buf = buf;
+
+	// Multithreading support
+	int start_block = n * needed_blocks / total_threads;
+	int end_block = start_block + needed_blocks / total_threads;
+
+	for (int i = start_block; i < end_block; i++) {
 		int offset = block_array[i]->readFromBlock(buf, bytes_per_block);
 		buf += offset;
 	} 
