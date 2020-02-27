@@ -1,7 +1,7 @@
 #include "ssd.hpp"
 ssd :: ssd(int num_blocks, int bs, int ps, int ssd_cell_type)
 {
-	int num_pages = bs / ps;
+	int num_pages = bs;
 	num_blocks_in_ssd = num_blocks;
 	size_of_block = bs;
 	bytes_per_block = bs * ps * ssd_cell_type;
@@ -45,20 +45,21 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	int needed_blocks = size / bytes_per_block;
 	assert(needed_blocks <= num_blocks_in_ssd); 
 	uint8_t *block_buf = buf;
+	int total_bytes_written = 0;
 
 	uint8_t *rbdata = new uint8_t [size]();
-	cout << "Bytes " << bytes_per_block;	
 	for (int i = 0; i < needed_blocks; i++) {
 		
 		int offset = block_array[i]->writeToBlock(block_buf, bytes_per_block);
-		int offset2 = block_array[i]->readFromBlock(rbdata, bytes_per_block);
-		printf("i=%d w=%d r=%d\n", i, block_buf[i], rbdata[i]);
-		cout << offset << endl << offset2 << endl;
-		block_buf += bytes_per_block;
-		rbdata += bytes_per_block;
+		// int offset2 = block_array[i]->readFromBlock(rbdata, bytes_per_block);
+		// printf("i=%d w=%d r=%d\n", i, block_buf[i], rbdata[i]);
+		// cout << offset << endl << offset2 << endl;
+		block_buf += offset;
+		// rbdata += offset2;
+		total_bytes_written += offset;
 	} 
 
-	return 0;
+	return total_bytes_written;
 }
 
 /* buf is initialized by caller */
@@ -71,13 +72,15 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 	int needed_blocks = size / bytes_per_block;
 	assert(needed_blocks <= num_blocks_in_ssd); 
 	uint8_t *block_buf = buf;
+	int total_bytes_read = 0;
 
 	for (int i = 0; i < needed_blocks; i++) {
 		int offset = block_array[i]->readFromBlock(block_buf, bytes_per_block);
 		block_buf += offset;
+		total_bytes_read += offset;
 	} 
 
-	return 0;
+	return total_bytes_read;
 }
 
 /*
