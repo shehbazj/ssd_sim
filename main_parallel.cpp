@@ -14,36 +14,27 @@ int main()
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 
-	// NEW CODE-- does block level creation, block level write and read.
+	uint8_t *wbdata = new uint8_t [ssd_capacity]();
+	uint8_t *rbdata = new uint8_t [ssd_capacity]();
 
-	block *b = new block(block_size, page_size , ssd_cell_type, 0, NO_WOM);
-
-	printf("physical block size = %lu\n", b->getPhysicalBlockSize());
-	printf("logical block size = %lu\n", b->getLogicalBlockSize());
-
-	int block_capacity_in_bytes = b->getPhysicalBlockSize();
-
-	uint8_t *wbdata = new uint8_t [block_capacity_in_bytes]();
-	uint8_t *rbdata = new uint8_t [block_capacity_in_bytes]();
-
-	for (int i = 0 ; i < block_capacity_in_bytes ; i++) {
+	for (int i = 0 ; i < ssd_capacity ; i++) {
 		wbdata[i] = 0xFF;
 	}
 
-	// b->writeToBlock(wbdata, block_capacity_in_bytes);
 	mySSD->write_to_disk(wbdata, ssd_capacity);
 	auto start_time = std::chrono::high_resolution_clock::now();
-	// b->readFromBlock(rbdata, block_capacity_in_bytes);
-	mySSD->read_from_disk(rbdata, ssd_capacity);
-	// for (int i = 0; i < 2; ++i)
-    // {
-	// 	boost::thread z(mySSD->read_from_disk(rbdata, block_capacity_in_bytes));
-	// 	z.join();
-    // }
+	// mySSD->read_from_disk(rbdata, ssd_capacity);
+	for (int i = 0; i < 2; ++i)
+    {
+		boost::thread worker(std::bind
+			(&ssd::read_from_disk_threads, mySSD, rbdata, ssd_capacity, i, 2)
+		);
+		worker.join();
+    }
 	auto end_time = std::chrono::high_resolution_clock::now();
 
-	for (int i = 0 ; i < block_capacity_in_bytes ; i++) {
-		// printf("i=%d w=%d r=%d\n", i, wbdata[i], rbdata[i]);
+	for (int i = 0 ; i < ssd_capacity ; i++) {
+		printf("i=%d w=%d r=%d\n", i, wbdata[i], rbdata[i]);
 		// assert(wbdata[i] == rbdata[i]);
 	}
 
@@ -52,6 +43,6 @@ int main()
 
 	delete []wbdata;
 	delete []rbdata;
-	delete b;
+	// delete b;
 	delete mySSD;
 }

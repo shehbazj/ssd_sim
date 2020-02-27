@@ -87,7 +87,7 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
  * Takes in an integer to split up the buffer into n
  * Used for parallelizing reads
 */
-int ssd :: read_from_disk(uint8_t *buf, int size, int n, int total_threads)
+int ssd :: read_from_disk_threads(uint8_t *buf, int size, int n, int total_threads)
 {
 	// Check if caller has initialized buffer
 	assert(buf != NULL);
