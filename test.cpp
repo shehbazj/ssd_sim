@@ -3338,6 +3338,39 @@ TEST(BlockReadWrite, Wom24_Repeated)
 	EXPECT_TRUE( 0 == std::memcmp(blocktowrite2, blocktoread2, lbsize));
 }
 
+TEST(SsdReadWrite, Test_read_write) 
+{
+	int num_blocks = 10;
+	// block size is the number of pages inside the block.
+	int block_size = 20;
+	int page_size = 10;
+	int ssd_cell_type = 3; // Multi-level cell
+	int ssd_capacity = num_blocks * block_size * page_size * ssd_cell_type;
+
+	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
+
+	// NEW CODE-- does block level creation, block level write and read.
+
+	uint8_t *wbdata = new uint8_t [ssd_capacity]();
+	uint8_t *rbdata = new uint8_t [ssd_capacity]();
+
+	for (int i = 0 ; i < ssd_capacity ; i++) {
+		wbdata[i] = 0xFF;
+	}
+
+	mySSD->write_to_disk(wbdata, ssd_capacity);
+	mySSD->read_from_disk(rbdata, ssd_capacity);
+
+	for (int i = 0 ; i < ssd_capacity ; i++) {
+		// printf("i=%d w=%d r=%d\n", i, wbdata[i], rbdata[i]);
+		EXPECT_TRUE(wbdata[i] == rbdata[i]);
+	}
+
+	delete []wbdata;
+	delete []rbdata;
+	delete mySSD;
+}
+
 // TODO: do this when we have invalid state. 
 // 1. Markks Cell Invalid, Writes Data to it again.
 // 2. Marks Multiple Cells Invalid. Writes To cell and reads back from 
