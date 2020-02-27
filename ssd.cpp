@@ -95,18 +95,21 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int size, int n, int total_threa
 	// Find number of blocks needed to write the buffer
 	int needed_blocks = size / bytes_per_block;
 	assert(needed_blocks <= num_blocks_in_ssd); 
-	uint8_t *block_buf = buf;
+	int total_bytes_read = 0;
 
 	// Multithreading support
 	int start_block = n * needed_blocks / total_threads;
 	int end_block = start_block + needed_blocks / total_threads;
+	// Start the read buffer from the start block bytes
+	uint8_t *block_buf = buf + (start_block * bytes_per_block);
 
 	for (int i = start_block; i < end_block; i++) {
-		int offset = block_array[i]->readFromBlock(buf, bytes_per_block);
-		buf += offset;
+		int offset = block_array[i]->readFromBlock(block_buf, bytes_per_block);
+		block_buf += offset;
+		total_bytes_read += offset;
 	} 
 
-	return 0;
+	return total_bytes_read;
 }
 
 ssd :: ~ssd()
