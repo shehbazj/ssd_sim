@@ -3349,8 +3349,6 @@ TEST(SsdReadWrite, Test_read_write)
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 
-	// NEW CODE-- does block level creation, block level write and read.
-
 	uint8_t *wbdata = new uint8_t [ssd_capacity]();
 	uint8_t *rbdata = new uint8_t [ssd_capacity]();
 
