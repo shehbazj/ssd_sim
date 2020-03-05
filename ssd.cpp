@@ -82,27 +82,28 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
  * Takes in an integer to split up the buffer into n
  * Used for parallelizing reads
 */
-int ssd :: read_from_disk_threads(uint8_t *buf, int size, int n, int total_threads)
+int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int blocks_per_thread)
 {
 	// Check if caller has initialized buffer
 	assert(buf != NULL);
 
 	// Find number of blocks needed to write the buffer
-	int needed_blocks = size / bytes_per_block;
-	assert(needed_blocks <= num_blocks_in_ssd); 
+	// int needed_blocks = size / bytes_per_block;
+	// assert(needed_blocks <= num_blocks_in_ssd); 
 	int total_bytes_read = 0;
 
 	// Multithreading support
-	int start_block = n * needed_blocks / total_threads;
-	int end_block = start_block + needed_blocks / total_threads;
+	int start_block = n * blocks_per_thread;
+	int end_block = start_block + blocks_per_thread;
 	// Start the read buffer from the start block bytes
 	// uint8_t *block_buf = buf + (start_block * bytes_per_block);
+	cout << "S " << start_block << " E " << end_block << " T " << num_blocks_in_ssd << endl;
 
 	auto total_time = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = start_block; i < end_block; i++) {
 		auto start_time = std::chrono::system_clock::now();
-		int offset = block_array[i]->readFromBlock(buf, bytes_per_block);
+		int offset = block_array[i]->readFromBlock(buf, block_size);
 		buf += offset;
 		total_bytes_read += offset;
 		auto end_time = std::chrono::system_clock::now();
@@ -113,6 +114,9 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int size, int n, int total_threa
 	// auto end_time = std::chrono::high_resolution_clock::now();
 	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 	// std::cout << "Total Duration " << total_time << endl;
+	for (int i; i < 10; i++) {
+		// printf("i=%d w=%d \n", i, buf[i]);
+	}
 
 	return total_bytes_read;
 }

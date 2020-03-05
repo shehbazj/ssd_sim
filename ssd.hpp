@@ -22,5 +22,5 @@ class ssd {
 		~ssd();
 		int write_to_disk(uint8_t *buf, int size);
 		int read_from_disk(uint8_t *buf, int size);
-		int read_from_disk_threads(uint8_t *buf, int size, int n, int total_threads);
+		int read_from_disk_threads(uint8_t *buf, int size, int n, int blocks_per_thread);
 };

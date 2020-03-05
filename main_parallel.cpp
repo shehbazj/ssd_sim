@@ -78,9 +78,10 @@ int main(int argc, char* argv[])
 
 	int blocks_per_thread = num_blocks / NUM_THREADS;
 	int block_capacity = block_size * page_size * ssd_cell_type;
-	int ssd_capacity = num_blocks * block_size * page_size * ssd_cell_type;
-	vector<uint8_t *> read_buffer;
+	int ssd_capacity = num_blocks * block_capacity;
+	// vector<uint8_t *> read_buffer;
 	vector<uint8_t *> write_buffer;
+	uint8_t** read_buffer = new uint8_t*[blocks_per_thread];
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 	
@@ -88,14 +89,15 @@ int main(int argc, char* argv[])
 	// uint8_t *rbdata = new uint8_t [ssd_capacity]();
 
 	for (int i = 0 ; i < ssd_capacity ; i++) {
-		wbdata[i] = i % 11; // Randomly write a byte modulo prime number
-		printf("i=%d w=%d \n", i, wbdata[i]);
+		wbdata[i] = 0xFF; // Randomly write a byte modulo prime number
+		// printf("i=%d w=%d \n", i, wbdata[i]);
 	}
 
 	// Declare a read buffer with n blocks
 	for (int i = 0 ; i < blocks_per_thread ; i++) {
 		// write_buffer.push_back(new uint8_t [block_capacity]());
-		read_buffer.push_back(new uint8_t [block_capacity]());
+		read_buffer[i] = (new uint8_t [block_capacity]());
+		cout << " b " << sizeof(read_buffer[i]) << endl;
 		// for (int j = 0; j < block_capacity; j++) {
 		// 	write_buffer[i][j] = j % 11;
 		// }
@@ -110,7 +112,7 @@ int main(int argc, char* argv[])
 		// 	(&ssd::read_from_disk_threads, mySSD, rbdata, ssd_capacity, i, 2)
 		// );
 		worker_threads.create_thread(
-			(boost::bind(&ssd::read_from_disk_threads, mySSD, read_buffer[i], ssd_capacity, i, NUM_THREADS))
+			(boost::bind(&ssd::read_from_disk_threads, mySSD, read_buffer[i], block_capacity, i, blocks_per_thread))
 		);
 		// worker.join();
 	}
@@ -122,21 +124,21 @@ int main(int argc, char* argv[])
 	// 	assert(wbdata[i] == rbdata[i]);
 	// }
 
-	for (int i = 0 ; i < blocks_per_thread ; i++) {
+	for (int i = 0 ; i < num_blocks ; i++) {
 		for (int j = 0; j < block_capacity; j++) {
-			printf("i=%d w=%d r=%d\n", i, wbdata[i * block_capacity + j], read_buffer[i][j]);
-			assert(wbdata[i * block_capacity + j] == read_buffer[i][j]);
+			// printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * block_capacity + j], read_buffer[i][j]);
+			// assert(wbdata[i * block_capacity + j] == read_buffer[i][j]);
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 	std::cout << "duration " << duration / 1000000.0 << endl;
 
-	for (int i = 0 ; i < write_buffer.size() ; i++) {
+	for (int i = 0 ; i < blocks_per_thread ; i++) {
 		// delete []write_buffer[i];
-		delete []read_buffer[i];
+		// delete []read_buffer[i];
 	} 
 
-	delete []wbdata;
+	// delete []wbdata;
 	// delete []rbdata;
 	delete mySSD;
 }
