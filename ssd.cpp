@@ -114,9 +114,6 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int block
 	// auto end_time = std::chrono::high_resolution_clock::now();
 	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 	// std::cout << "Total Duration " << total_time << endl;
-	for (int i; i < 10; i++) {
-		// printf("i=%d w=%d \n", i, buf[i]);
-	}
 
 	return total_bytes_read;
 }
