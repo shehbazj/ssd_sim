@@ -78,10 +78,11 @@ int main(int argc, char* argv[])
 
 	int blocks_per_thread = num_blocks / NUM_THREADS;
 	int block_capacity = block_size * page_size * ssd_cell_type;
+	int capacity_per_thread = blocks_per_thread * block_capacity;
 	int ssd_capacity = num_blocks * block_capacity;
 	// vector<uint8_t *> read_buffer;
 	vector<uint8_t *> write_buffer;
-	uint8_t** read_buffer = new uint8_t*[blocks_per_thread];
+	uint8_t** read_buffer = new uint8_t*[NUM_THREADS];
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 	
@@ -94,10 +95,9 @@ int main(int argc, char* argv[])
 	}
 
 	// Declare a read buffer with n blocks
-	for (int i = 0 ; i < blocks_per_thread ; i++) {
+	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		// write_buffer.push_back(new uint8_t [block_capacity]());
-		read_buffer[i] = (new uint8_t [block_capacity]());
-		cout << " b " << sizeof(read_buffer[i]) << endl;
+		read_buffer[i] = (new uint8_t [capacity_per_thread]());
 		// for (int j = 0; j < block_capacity; j++) {
 		// 	write_buffer[i][j] = j % 11;
 		// }
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0 ; i < num_blocks ; i++) {
 		for (int j = 0; j < block_capacity; j++) {
-			// printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * block_capacity + j], read_buffer[i][j]);
+			printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * block_capacity + j], read_buffer[i][j]);
 			// assert(wbdata[i * block_capacity + j] == read_buffer[i][j]);
 		}
 	}
