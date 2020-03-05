@@ -124,9 +124,9 @@ int main(int argc, char* argv[])
 	// 	assert(wbdata[i] == rbdata[i]);
 	// }
 
-	for (int i = 0 ; i < num_blocks ; i++) {
-		for (int j = 0; j < block_capacity; j++) {
-			printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * block_capacity + j], read_buffer[i][j]);
+	for (int i = 0 ; i < NUM_THREADS ; i++) {
+		for (int j = 0; j < capacity_per_thread; j++) {
+			printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * NUM_THREADS + j], read_buffer[i][j]);
 			// assert(wbdata[i * block_capacity + j] == read_buffer[i][j]);
 		}
 	}
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 		// delete []read_buffer[i];
 	} 
 
-	// delete []wbdata;
+	delete []wbdata;
 	// delete []rbdata;
 	delete mySSD;
 }
