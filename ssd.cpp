@@ -86,18 +86,15 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int block
 {
 	// Check if caller has initialized buffer
 	assert(buf != NULL);
+	assert(num_blocks_in_ssd >= n * blocks_per_thread);
 
 	// Find number of blocks needed to write the buffer
-	// int needed_blocks = size / bytes_per_block;
-	// assert(needed_blocks <= num_blocks_in_ssd); 
 	int total_bytes_read = 0;
 
 	// Multithreading support
 	int start_block = n * blocks_per_thread;
 	int end_block = start_block + blocks_per_thread;
 	// Start the read buffer from the start block bytes
-	// uint8_t *block_buf = buf + (start_block * bytes_per_block);
-	cout << "S " << start_block << " E " << end_block << " T " << num_blocks_in_ssd << endl;
 
 	auto total_time = 0;
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -109,7 +106,7 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int block
 		auto end_time = std::chrono::system_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 		total_time += double(duration);
-		std::cout << "nth " << n << " block " << i << " Duration " << duration << endl;
+		// std::cout << "nth " << n << " block " << i << " Duration " << duration << endl;
 	} 
 	// auto end_time = std::chrono::high_resolution_clock::now();
 	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();

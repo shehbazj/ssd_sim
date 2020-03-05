@@ -90,8 +90,7 @@ int main(int argc, char* argv[])
 	// uint8_t *rbdata = new uint8_t [ssd_capacity]();
 
 	for (int i = 0 ; i < ssd_capacity ; i++) {
-		wbdata[i] = 0xFF; // Randomly write a byte modulo prime number
-		// printf("i=%d w=%d \n", i, wbdata[i]);
+		wbdata[i] = i % 11; // Randomly write a byte modulo prime number
 	}
 
 	// Declare a read buffer with n blocks
@@ -126,8 +125,8 @@ int main(int argc, char* argv[])
 
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		for (int j = 0; j < capacity_per_thread; j++) {
-			// printf("i=%d w=%d r=%d\n", i * block_capacity + j, wbdata[i * NUM_THREADS + j], read_buffer[i][j]);
-			assert(wbdata[i * block_capacity + j] == read_buffer[i][j]);
+			// printf("i=%d w=%d r=%d\n", i * capacity_per_thread + j, wbdata[i * capacity_per_thread + j], read_buffer[i][j]);
+			assert(wbdata[i * capacity_per_thread + j] == read_buffer[i][j]);
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
