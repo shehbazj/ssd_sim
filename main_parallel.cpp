@@ -80,14 +80,12 @@ int main(int argc, char* argv[])
 	int block_capacity = block_size * page_size * ssd_cell_type;
 	int capacity_per_thread = blocks_per_thread * block_capacity;
 	int ssd_capacity = num_blocks * block_capacity;
-	// vector<uint8_t *> read_buffer;
 	vector<uint8_t *> write_buffer;
 	uint8_t** read_buffer = new uint8_t*[NUM_THREADS];
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 	
 	uint8_t *wbdata = new uint8_t [ssd_capacity]();
-	// uint8_t *rbdata = new uint8_t [ssd_capacity]();
 
 	for (int i = 0 ; i < ssd_capacity ; i++) {
 		wbdata[i] = i % 11; // Randomly write a byte modulo prime number
@@ -105,23 +103,13 @@ int main(int argc, char* argv[])
 	mySSD->write_to_disk(wbdata, ssd_capacity);
 	boost::thread_group worker_threads;
 	auto start_time = std::chrono::high_resolution_clock::now();
-	// mySSD->read_from_disk(rbdata, ssd_capacity);
 	for (int i = 0; i < NUM_THREADS; ++i) {
-		// boost::thread worker(boost::bind
-		// 	(&ssd::read_from_disk_threads, mySSD, rbdata, ssd_capacity, i, 2)
-		// );
 		worker_threads.create_thread(
 			(boost::bind(&ssd::read_from_disk_threads, mySSD, read_buffer[i], capacity_per_thread, i, blocks_per_thread))
 		);
-		// worker.join();
 	}
 	worker_threads.join_all();
 	auto end_time = std::chrono::high_resolution_clock::now();
-	
-	// for (int i = 0 ; i < ssd_capacity ; i++) {
-	// 	printf("i=%d w=%d r=%d\n", i, wbdata[i], wbdata[i]);
-	// 	assert(wbdata[i] == rbdata[i]);
-	// }
 
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		for (int j = 0; j < capacity_per_thread; j++) {
@@ -138,7 +126,6 @@ int main(int argc, char* argv[])
 	} 
 
 	delete []wbdata;
-	// delete []rbdata;
 	delete mySSD;
 }
 
