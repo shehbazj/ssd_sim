@@ -375,15 +375,22 @@ int block :: readFromBlock(uint8_t *read_block, int read_block_size)
 	assert(zeroed_page != nullptr);
 	int read_index = 0;
 
+	auto total_time = 0;
 	for(ppn = 0 ; ppn < getNumPages() ; ppn++)
 	{
+		
 		readPage(ppn, coded_page);
+		
 		bits_decoded = C->decode(decoded_page->getBuf(),coded_page->getBuf(), physical_page_size_bytes);
 		bytes_decoded = bits_decoded / 8;
 		if(read_index + bytes_decoded > read_block_size) {
 			printf("read buffer shorter than decoded message, truncate decoded message r+b %d rbs %d\n", read_index + bytes_decoded , read_block_size);
 			bytes_decoded = (read_block_size - read_index);
 		}
+		// auto start_time = std::chrono::high_resolution_clock::now();
+		// auto end_time = std::chrono::high_resolution_clock::now();
+		// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
+		// total_time += double(duration);
 		memcpy(read_block + read_index , decoded_page->getBuf(), bytes_decoded);
 		read_index += bytes_decoded;
 		if(bits_decoded != decoded_page_size_bytes * 8) {
@@ -392,6 +399,7 @@ int block :: readFromBlock(uint8_t *read_block, int read_block_size)
 		coded_page->setBuf(zeroed_page->getBuf(), physical_page_size_bytes);
 		decoded_page->setBuf(zeroed_page->getBuf(), decoded_page_size_bytes);
 	}
+	// std::cout << "Total Duration " << total_time << endl;
 
 	if(coded_page!=nullptr) {
 		delete coded_page;

@@ -47,15 +47,10 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 	uint8_t *block_buf = buf;
 	int total_bytes_written = 0;
 
-	uint8_t *rbdata = new uint8_t [size]();
+	// uint8_t *rbdata = new uint8_t [size]();
 	for (int i = 0; i < needed_blocks; i++) {
-		
 		int offset = block_array[i]->writeToBlock(block_buf, bytes_per_block);
-		// int offset2 = block_array[i]->readFromBlock(rbdata, bytes_per_block);
-		// printf("i=%d w=%d r=%d\n", i, block_buf[i], rbdata[i]);
-		// cout << offset << endl << offset2 << endl;
 		block_buf += offset;
-		// rbdata += offset2;
 		total_bytes_written += offset;
 	} 
 
@@ -101,13 +96,23 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int size, int n, int total_threa
 	int start_block = n * needed_blocks / total_threads;
 	int end_block = start_block + needed_blocks / total_threads;
 	// Start the read buffer from the start block bytes
-	uint8_t *block_buf = buf + (start_block * bytes_per_block);
+	// uint8_t *block_buf = buf + (start_block * bytes_per_block);
 
+	auto total_time = 0;
+	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = start_block; i < end_block; i++) {
-		int offset = block_array[i]->readFromBlock(block_buf, bytes_per_block);
-		block_buf += offset;
+		auto start_time = std::chrono::system_clock::now();
+		int offset = block_array[i]->readFromBlock(buf, bytes_per_block);
+		buf += offset;
 		total_bytes_read += offset;
+		auto end_time = std::chrono::system_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
+		total_time += double(duration);
+		std::cout << "nth " << n << " block " << i << " Duration " << duration << endl;
 	} 
+	// auto end_time = std::chrono::high_resolution_clock::now();
+	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
+	// std::cout << "Total Duration " << total_time << endl;
 
 	return total_bytes_read;
 }
