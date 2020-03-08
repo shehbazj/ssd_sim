@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <cstdint>
+#include "sockettest.h"
 
 using namespace std;
 
@@ -11,6 +12,8 @@ int main()
 	int choice;
 	int cell_no;
 	int value;
+
+	class MyClient C;
 
 	// TODO create a normal C++ socket here...
 
