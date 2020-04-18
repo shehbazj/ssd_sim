@@ -62,7 +62,10 @@ int benchmark_threads() {
 
 int main(int argc, char* argv[])
 {
-	assert(argc > 2);
+	if (argc <= 2) {
+		cout << "Usage: ./main_parallel [NUM_THREADS] [NUM_BLOCKS]" << endl;
+		return 1;
+	}
 
 	int NUM_THREADS = atoi(argv[1]);
 	int num_blocks = atoi(argv[2]);
