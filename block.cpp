@@ -40,6 +40,10 @@ block:: ~block()
 	{
 		delete page_array[i];
 	}
+<<<<<<< HEAD
+=======
+	delete C;
+>>>>>>> b19e4f1... Fix memory leak in block
 }
 
 enum blockStatus block:: getBlockStatus()
