@@ -134,8 +134,8 @@ int main(int argc, char* argv[])
 		// }
 	}
 
-	mySSD->write_to_disk(wbdata, ssd_capacity);
-	// mySSD->write_to_disk_threads(wbdata, block_capacity, 0, num_blocks);
+	// mySSD->write_to_disk(wbdata, ssd_capacity);
+	mySSD->write_to_disk_threads(wbdata, block_capacity, 0, num_blocks);
 	boost::thread_group worker_threads;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < NUM_THREADS; ++i) {
@@ -150,8 +150,7 @@ int main(int argc, char* argv[])
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		for (int j = 0; j < capacity_per_thread; j++) {
 			// printf("i=%d w=%d r=%d\n", i * capacity_per_thread + j, wbdata[i * capacity_per_thread + j], read_buffer[i][j]);
-			// assert(wbdata[i * capacity_per_thread + j] == read_buffer[i][j]);
-			0;
+			assert(wbdata[i * capacity_per_thread + j] == read_buffer[i][j]);
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
