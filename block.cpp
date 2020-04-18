@@ -40,6 +40,7 @@ block:: ~block()
 	{
 		delete page_array[i];
 	}
+	delete C;
 }
 
 enum blockStatus block:: getBlockStatus()

@@ -1,13 +1,14 @@
 #include <vector>
 #include <stdint.h>
 #include "block.hpp"
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <chrono>
 
 using namespace std;
 
 class ssd {
 	private:
-		vector <block *> block_array;
+		boost::ptr_vector <block> block_array;
 		unsigned long num_blocks_in_ssd;
 		unsigned long size_of_block;
 		unsigned long bytes_per_block;
@@ -21,6 +22,7 @@ class ssd {
 		ssd(int num_blocks, int bs, int ps, int ssd_cell_type);
 		~ssd();
 		int write_to_disk(uint8_t *buf, int size);
+		int write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks_per_thread);
 		int read_from_disk(uint8_t *buf, int size);
 		int read_from_disk_threads(uint8_t *buf, int size, int n, int blocks_per_thread);
 };

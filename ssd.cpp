@@ -11,9 +11,9 @@ ssd :: ssd(int num_blocks, int bs, int ps, int ssd_cell_type)
 	max_invalid_block_threshold = 80;
 	max_invalid_page_threshold = 80;
 
-	for (int i = 0 ; i < num_blocks ; i++) {
+	for (int i = 0 ; i < num_blocks_in_ssd ; i++) {
 		block_array.push_back(new block(num_pages, ps ,ssd_cell_type, 0, NO_WOM));
-		block_array[i]->setBlockNumber(i);
+		block_array.back().setBlockNumber(i);
 	}
 }
 
@@ -49,10 +49,46 @@ int ssd :: write_to_disk(uint8_t *buf, int size)
 
 	// uint8_t *rbdata = new uint8_t [size]();
 	for (int i = 0; i < needed_blocks; i++) {
-		int offset = block_array[i]->writeToBlock(block_buf, bytes_per_block);
+		int offset = block_array[i].writeToBlock(block_buf, bytes_per_block);
 		block_buf += offset;
 		total_bytes_written += offset;
 	} 
+
+	return total_bytes_written;
+}
+
+/*
+ * Takes in an integer to split up the buffer into 'n' segments
+ * Used for parallelizing write
+*/
+int ssd :: write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks_per_thread)
+{
+	// Check if caller has initialized buffer
+	assert(buf != NULL);
+	assert(num_blocks_in_ssd >= n * blocks_per_thread);
+
+	// Find number of blocks needed to write the buffer
+	int total_bytes_written = 0;
+
+	// Multithreading support
+	int start_block = n * blocks_per_thread;
+	int end_block = start_block + blocks_per_thread;
+
+	// Start the write buffer from the start block bytes
+	// auto total_time = 0;
+	// auto start_time = std::chrono::high_resolution_clock::now();
+	for (int i = start_block; i < end_block; i++) {
+		// auto start_time = std::chrono::system_clock::now();
+		int offset = block_array[i].writeToBlock(buf, block_size);
+		buf += offset;
+		total_bytes_written += offset;
+		// auto end_time = std::chrono::system_clock::now();
+		// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
+		// total_time += double(duration);
+	} 
+	// auto end_time = std::chrono::high_resolution_clock::now();
+	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
+	// std::cout << "Total Duration " << total_time << endl;
 
 	return total_bytes_written;
 }
@@ -70,7 +106,7 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 	int total_bytes_read = 0;
 
 	for (int i = 0; i < needed_blocks; i++) {
-		int offset = block_array[i]->readFromBlock(block_buf, bytes_per_block);
+		int offset = block_array[i].readFromBlock(block_buf, bytes_per_block);
 		block_buf += offset;
 		total_bytes_read += offset;
 	} 
@@ -79,7 +115,7 @@ int ssd :: read_from_disk(uint8_t *buf, int size)
 }
 
 /*
- * Takes in an integer to split up the buffer into n
+ * Takes in an integer to split up the buffer into 'n' segments
  * Used for parallelizing reads
 */
 int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int blocks_per_thread)
@@ -100,13 +136,12 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int block
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = start_block; i < end_block; i++) {
 		auto start_time = std::chrono::system_clock::now();
-		int offset = block_array[i]->readFromBlock(buf, block_size);
+		int offset = block_array[i].readFromBlock(buf, bytes_per_block);
 		buf += offset;
 		total_bytes_read += offset;
 		auto end_time = std::chrono::system_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 		total_time += double(duration);
-		// std::cout << "nth " << n << " block " << i << " Duration " << duration << endl;
 	} 
 	// auto end_time = std::chrono::high_resolution_clock::now();
 	// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
@@ -117,9 +152,10 @@ int ssd :: read_from_disk_threads(uint8_t *buf, int block_size, int n, int block
 
 ssd :: ~ssd()
 {
-	for (int i = 0 ; i < num_blocks_in_ssd ; i++) {
-		delete block_array[i];
-	}
+	// for (int i = 0 ; i < num_blocks_in_ssd ; i++) {
+	// 	block_array[i].erase();
+	// }
+	block_array.clear();
 }
 
 void ssd :: invokeGC()
