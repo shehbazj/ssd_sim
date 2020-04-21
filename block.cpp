@@ -335,9 +335,9 @@ int block :: writeToBlock(uint8_t *ip_write_block, int data_size)
 	delete new_code_page;
 	new_code_page=nullptr;
 
-	delete write_page;
+	delete []write_page;
 	write_page=nullptr;
-	delete zeroed_page;
+	delete []zeroed_page;
 	zeroed_page = nullptr;
 
 	return write_logical_buf_offset;
