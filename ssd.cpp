@@ -88,7 +88,7 @@ int ssd :: write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks
 	} 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
-	std::cout << "Total Duration " << duration << endl;
+	// std::cout << "Total Duration " << duration << endl;
 
 	return total_bytes_written;
 }

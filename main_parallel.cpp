@@ -26,16 +26,16 @@ int benchmark_threads() {
 		}
 
 		mySSD->write_to_disk(wbdata, ssd_capacity);
-		boost::thread_group worker_threads;
+		boost::thread_group read_threads;
 		int NUM_THREADS = ii;
 		// auto start_time = std::chrono::high_resolution_clock::now();
 		// mySSD->read_from_disk(rbdata, ssd_capacity);
 		for (int i = 0; i < NUM_THREADS; ++i) {
-			worker_threads.create_thread(
+			read_threads.create_thread(
 				(boost::bind(&ssd::read_from_disk_threads, mySSD, rbdata, ssd_capacity, i, NUM_THREADS))
 			);
 		}
-		worker_threads.join_all();
+		read_threads.join_all();
 		// auto end_time = std::chrono::high_resolution_clock::now();
 		
 		bool check = true;
@@ -60,7 +60,8 @@ int benchmark_threads() {
 	}
 }
 
-int simple_test() {
+// Test for single threaded reads and writes
+int single_thread_test() {
 	int num_blocks = 10;
 	// block size is the number of pages inside the block.
 	int block_size = 20;
@@ -82,8 +83,7 @@ int simple_test() {
 
 	for (int i = 0 ; i < ssd_capacity ; i++) {
 		// printf("i=%d w=%d r=%d\n", i, wbdata[i], rbdata[i]);
-		// assert(wbdata[i] == rbdata[i]);
-		0;
+		assert(wbdata[i] == rbdata[i]);
 	}
 
 	delete []wbdata;
@@ -104,7 +104,6 @@ int main(int argc, char* argv[])
 	assert(NUM_THREADS > 0);
 	assert(num_blocks > 0);
 
-	// benchmark_threads();
 	// block size is the number of pages inside the block.
 	int block_size = 20; //20
 	int page_size = 10; //10
@@ -136,14 +135,14 @@ int main(int argc, char* argv[])
 
 	// mySSD->write_to_disk(wbdata, ssd_capacity);
 	mySSD->write_to_disk_threads(wbdata, block_capacity, 0, num_blocks);
-	boost::thread_group worker_threads;
+	boost::thread_group read_threads;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < NUM_THREADS; ++i) {
-		worker_threads.create_thread(
+		read_threads.create_thread(
 			(boost::bind(&ssd::read_from_disk_threads, mySSD, read_buffer[i], capacity_per_thread, i, blocks_per_thread))
 		);
 	}
-	worker_threads.join_all();
+	read_threads.join_all();
 	auto end_time = std::chrono::high_resolution_clock::now();
 
 	// Check if read buffer is correct
@@ -154,7 +153,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
-	std::cout << "duration " << duration / 1000000.0 << endl;
+	std::cout << "duration (s): " << duration / 1000000.0 << endl;
 
 	// Clean up
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
