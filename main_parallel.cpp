@@ -113,28 +113,42 @@ int main(int argc, char* argv[])
 	int block_capacity = block_size * page_size * ssd_cell_type; // bytes per block
 	int capacity_per_thread = blocks_per_thread * block_capacity; // bytes per thread
 	int ssd_capacity = num_blocks * block_capacity;
-	vector<uint8_t *> write_buffer;
+	uint8_t** write_buffer = new uint8_t*[NUM_THREADS];
 	uint8_t** read_buffer = new uint8_t*[NUM_THREADS];
 
 	ssd *mySSD = new ssd(num_blocks, block_size, page_size, ssd_cell_type);
 	
-	uint8_t *wbdata = new uint8_t [ssd_capacity]();
+	// uint8_t *wbdata = new uint8_t [ssd_capacity]();
 
-	for (int i = 0 ; i < ssd_capacity ; i++) {
-		wbdata[i] = i % 11; // Randomly write a byte modulo prime number
-	}
+	// for (int i = 0 ; i < ssd_capacity ; i++) {
+	// 	wbdata[i] = i % 11; // Randomly write a byte modulo prime number
+	// }
 
 	// Declare a read buffer with n blocks
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		// write_buffer.push_back(new uint8_t [block_capacity]());
 		read_buffer[i] = (new uint8_t [capacity_per_thread]());
-		// for (int j = 0; j < block_capacity; j++) {
-		// 	write_buffer[i][j] = j % 11;
-		// }
+		write_buffer[i] = (new uint8_t [capacity_per_thread]());
+		for (int j = 0; j < capacity_per_thread; j++) {
+			write_buffer[i][j] = j % 11;
+			// printf("i=%d w=%d\n", i , write_buffer[i][j]);
+		}
 	}
 
 	// mySSD->write_to_disk(wbdata, ssd_capacity);
-	mySSD->write_to_disk_threads(wbdata, block_capacity, 0, num_blocks);
+	// mySSD->write_to_disk_threads(wbdata, block_capacity, 0, num_blocks);
+	boost::thread_group write_threads;
+	auto start_time2 = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < NUM_THREADS; ++i) {
+		write_threads.create_thread(
+			(boost::bind(&ssd::write_to_disk_threads, mySSD, write_buffer[i], capacity_per_thread, i, blocks_per_thread))
+		);
+	}
+	write_threads.join_all();
+	auto end_time2 = std::chrono::high_resolution_clock::now();
+	auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(end_time2-start_time2).count();
+	std::cout << "write duration (sec): " << duration2 / 1000000.0 << endl;
+
 	boost::thread_group read_threads;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < NUM_THREADS; ++i) {
@@ -149,19 +163,20 @@ int main(int argc, char* argv[])
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
 		for (int j = 0; j < capacity_per_thread; j++) {
 			// printf("i=%d w=%d r=%d\n", i * capacity_per_thread + j, wbdata[i * capacity_per_thread + j], read_buffer[i][j]);
-			assert(wbdata[i * capacity_per_thread + j] == read_buffer[i][j]);
+			// assert(wbdata[i * capacity_per_thread + j] == read_buffer[i][j]);
+			// printf("i=%d w=%d r=%d\n", i , write_buffer[i][j], read_buffer[i][j] );
+			assert(write_buffer[i][j] == read_buffer[i][j]);
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
-	std::cout << "duration (s): " << duration / 1000000.0 << endl;
+	std::cout << "read duration (sec): " << duration / 1000000.0 << endl;
 
 	// Clean up
 	for (int i = 0 ; i < NUM_THREADS ; i++) {
-		// delete []write_buffer[i];
+		delete []write_buffer[i];
 		delete []read_buffer[i];
 	} 
 
-	delete []wbdata;
 	delete mySSD;
 }
 

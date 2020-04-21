@@ -67,6 +67,11 @@ int ssd :: write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks
 	assert(buf != NULL);
 	assert(num_blocks_in_ssd >= n * blocks_per_thread);
 
+	// debug the buf
+	// for (auto i = 0; i < block_size; i++) {
+	// 	printf("i=%d w=%d\n", i , buf[i]);
+	// }
+
 	// Find number of blocks needed to write the buffer
 	int total_bytes_written = 0;
 
@@ -79,9 +84,10 @@ int ssd :: write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks
 	auto start_time = std::chrono::high_resolution_clock::now();
 	for (int i = start_block; i < end_block; i++) {
 		// auto start_time = std::chrono::system_clock::now();
-		int offset = block_array[i].writeToBlock(buf, block_size);
+		int offset = block_array[i].writeToBlock(buf, bytes_per_block);
 		buf += offset;
 		total_bytes_written += offset;
+		// cout << "off " << offset << endl;
 		// auto end_time = std::chrono::system_clock::now();
 		// auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 		// total_time += double(duration);
@@ -89,7 +95,7 @@ int ssd :: write_to_disk_threads(uint8_t *buf, int block_size, int n, int blocks
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-start_time).count();
 	// std::cout << "Total Duration " << duration << endl;
-
+	// cout << "total " << total_bytes_written << endl;
 	return total_bytes_written;
 }
 
