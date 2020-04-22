@@ -48,3 +48,23 @@ After making the file with necessary options, run the gprof tool to output the p
 
 ```
 $  gprof test_gprof gmon.out > analysis.txt
+```
+
+#### Troubleshooting
+##### CMake cannot find GTest
+Error:
+```
+CMake Error at /usr/share/cmake-3.10/Modules/FindPackageHandleStandardArgs.cmake:137 (message):
+  Could NOT find GTest (missing: GTEST_LIBRARY GTEST_MAIN_LIBRARY)
+```
+
+Solution:
+```
+sudo apt-get install cmake libgtest-dev
+cd /usr/src/gtest
+sudo cmake CMakeLists.txt
+sudo make
+ 
+# copy or symlink libgtest.a and libgtest_main.a to your /usr/lib folder
+sudo cp *.a /usr/lib
+```
