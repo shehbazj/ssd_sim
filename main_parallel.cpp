@@ -95,7 +95,7 @@ int multithread_test(int num_threads, int num_blocks) {
 	assert(num_threads > 0);
 	assert(num_blocks > 0);
 
-	cout << "Threads : " << num_threads << " Blocks: " << num_blocks << endl;
+	// cout << "Threads : " << num_threads << " Blocks: " << num_blocks << endl;
 
 	int block_size = 20; //20 # of pages in block
 	int page_size = 10; //10 # of cells in page
@@ -133,7 +133,7 @@ int multithread_test(int num_threads, int num_blocks) {
 	write_threads.join_all();
 	auto write_time_end = std::chrono::high_resolution_clock::now();
 	auto duration_write = std::chrono::duration_cast<std::chrono::microseconds>(write_time_end-write_time).count();
-	std::cout << "write duration (sec): " << duration_write / 1000000.0 << endl;
+	// std::cout << "write duration (sec): " << duration_write / 1000000.0 << endl;
 
 	// Multithreaded reads to ssd
 	boost::thread_group read_threads;
@@ -154,7 +154,10 @@ int multithread_test(int num_threads, int num_blocks) {
 		}
 	}
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time-read_start_time).count();
-	std::cout << "read duration (sec): " << duration / 1000000.0 << endl;
+	// std::cout << "read duration (sec): " << duration / 1000000.0 << endl;
+
+	// CSV format print
+	cout << num_threads << ", " << duration / 1000000.0 << ", " << duration_write / 1000000.0 << endl;
 
 	// Clean up
 	for (int i = 0 ; i < num_threads ; i++) {
