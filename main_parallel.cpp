@@ -157,7 +157,8 @@ int multithread_test(int num_threads, int num_blocks) {
 	// std::cout << "read duration (sec): " << duration / 1000000.0 << endl;
 
 	// CSV format print
-	cout << num_threads << ", " << duration / 1000000.0 << ", " << duration_write / 1000000.0 << endl;
+	cout << num_threads << ", " << duration / 1000000.0 << ", " << duration_write / 1000000.0 << ", " << 
+		(duration + duration_write)/1000000.0 << endl;
 
 	// Clean up
 	for (int i = 0 ; i < num_threads ; i++) {
@@ -180,7 +181,12 @@ int main(int argc, char* argv[])
 	int NUM_THREADS = atoi(argv[1]);
 	int num_blocks = atoi(argv[2]);
 
-	vector<int> threads = {1, 2, 4, 5, 10, 20, 50, 100};
+	vector<int> threads;
+	for (int i = 1; i < 51; ++i) {
+		threads.push_back(i);
+	}
+
+	cout << "Threads, Read, Write, Total" << endl;
 
 	for (auto i : threads) {
 		multithread_test(i, num_blocks);
